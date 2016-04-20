@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8"/>
+    <title>PostalJS Example App</title>
+    <link rel="stylesheet" href="style.css"/>
+    <script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="bower_components/postal.js/lib/postal.min.js"></script>
+    <script type="text/javascript" src="bower_components/babel-polyfill/browser-polyfill.js"></script>
+    <script type="text/javascript" src="bower_components/postal.federation/lib/postal.federation.min.js"></script>
+    <script type="text/javascript" src="bower_components/postal.xframe/lib/postal.xframe.min.js"></script>
+
+</head>
+<body>
+<div id="menubar">
+    <form id="pubframe" onsubmit="return onPublish()" method="get">
+        <input type="submit" value="publish" name="pub"/>
+    </form>
+    <ul>
+        <li><a href="frame1.htm" target="service_frame">Frame 1 </a></li>
+        <li><a href="frame2.htm" target="service_frame">Frame 2</a></li>
+    </ul>
+</div>
+
+<div id="sidebar">
+    <ul id="publist">
+    </ul>
+</div>
+<div id="center">
+    <iframe id="frame" src="iframe.htm" width="624" height="512" name="service_frame">
+    </iframe>
+</div>
+
+<script>
+    postal.instanceId("parent");
+    postal.fedx.transports.xframe.configure({
+        allowOrigins: ["./index.htm", "./frame.htm"],
+        defaultOriginUrl: ["./index.htm"],
+        enabled: true
+    });
+
+    postal.fedx.addFilter([
+        {channel: "frames", topic: "#", direction: "out"},
+        {channel: "parent", topic: "#", direction: "in"}
+    ]);
+
+    postal.fedx.signalReady(function(federationInfo) {
+        console.log("federationInfo: \n" + federationInfo);
+    });
+
+
+
+    postal.subscribe({
+        channel: "parent",
+        topic: "frame.message",
+        callback: function (data, envelope) {
+            console.log("parent subscribe");
+            var ul, li;
+            ul = document.getElementById("publist");
+            for (i = 0; i < data.length; i++) {
+                li = document.createElement("li");
+                li.appendChild(document.createTextNode(data[i]));
+                ul.appendChild(li);
+            }
+        }
+    });
+
+    function onPublish() {
+        console.log("send remote: " + postal.fedx.canSendRemote('frames', 'parent.message'));
+        console.log("parent publish");
+        postal.publish({
+            channel: "frames",
+            topic: "parent.message",
+            data: ["publish", "to", "frame1"]
+        });
+        return false;
+    }
+</script>
+</body>
+</html>
