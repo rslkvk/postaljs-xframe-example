@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <meta charset="utf-8"/>
+    <title>PostalJS Example App</title>
     <style>
         #f1 {
             position: absolute;
@@ -11,16 +13,13 @@
             left: 14.5em;
         }
     </style>
-
-    <meta charset="utf-8"/>
-
     <script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
     <script type="text/javascript" src="bower_components/postal.js/lib/postal.min.js"></script>
     <script type="text/javascript" src="bower_components/babel-polyfill/browser-polyfill.js"></script>
     <script type="text/javascript" src="bower_components/postal.federation/lib/postal.federation.min.js"></script>
     <script type="text/javascript" src="bower_components/postal.xframe/lib/postal.xframe.min.js"></script>
-
-    <title>PostalJS Example App</title>
+    <script type="text/javascript" src="bower_components/conduitjs/lib/conduit.min.js"></script>
+    <script type="text/javascript" src="bower_components/postal.preserve/lib/postal.preserve.min.js"></script>
 </head>
 
 <body>
@@ -59,10 +58,6 @@
 //        return false;
 //    }
 
-    postal.fedx.onFederatedMsg(data) {
-        console.log(data);
-    };  
-
     postal.subscribe({
         channel: "frames",
         topic: "parent.message",
@@ -75,7 +70,7 @@
                 ul.appendChild(li);
             }
         }
-    });
+    }).enlistPreserved();
 
 </script>
 

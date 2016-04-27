@@ -5,12 +5,12 @@
     <title>PostalJS Example App</title>
     <link rel="stylesheet" href="style.css"/>
     <script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
-    <script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
     <script type="text/javascript" src="bower_components/postal.js/lib/postal.min.js"></script>
-    <script type="text/javascript" src="bower_components/babel-polyfill/browser-polyfill.js"></script>
+    <script type="text/javascript" src="bower_components/babel-polyfill/browser-polyfill.js"></script>>
     <script type="text/javascript" src="bower_components/postal.federation/lib/postal.federation.min.js"></script>
     <script type="text/javascript" src="bower_components/postal.xframe/lib/postal.xframe.min.js"></script>
-
+    <script type="text/javascript" src="bower_components/conduitjs/lib/conduit.min.js"></script>
+    <script type="text/javascript" src="bower_components/postal.preserve/lib/postal.preserve.min.js"></script>
 </head>
 <body>
 <div id="menubar">
@@ -23,7 +23,8 @@
     </ul>
 </div>
 
-<div id="sidebar">
+<div id
+             ="sidebar">
     <ul id="publist">
     </ul>
 </div>
@@ -45,11 +46,14 @@
         {channel: "parent", topic: "#", direction: "in"}
     ]);
 
+//    var tap = postal.addWireTap(function(d, e) {
+//        console.log("wire tapping...");
+//        console.log("ID: " + postal.instanceId() + " - " + JSON.stringify(e, null, 4));
+//    });
+
     postal.fedx.signalReady(function(federationInfo) {
-        console.log("federationInfo: \n" + federationInfo);
+//        console.log("federationInfo: \n" + federationInfo);
     });
-
-
 
     postal.subscribe({
         channel: "parent",
@@ -72,10 +76,15 @@
         postal.publish({
             channel: "frames",
             topic: "parent.message",
-            data: ["publish", "to", "frame1"]
+            data: ["publish", "to", "frame1"],
+            headers: {
+                preserve: true,
+                expires: new Date("2020-05-15T04:45:00.000Z")
+            }
         });
         return false;
     }
+
 </script>
 </body>
 </html>

@@ -2,6 +2,8 @@
 <html lang="de">
 
 <head>
+    <meta charset="utf-8"/>
+    <title>PostalJS Example App</title>
     <style>
         #f1 {
             position: absolute;
@@ -12,16 +14,13 @@
             left: 14.5em;
         }
     </style>
-
-    <meta charset="utf-8"/>
-
     <script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
     <script type="text/javascript" src="bower_components/postal.js/lib/postal.min.js"></script>
     <script type="text/javascript" src="bower_components/babel-polyfill/browser-polyfill.js"></script>
     <script type="text/javascript" src="bower_components/postal.federation/lib/postal.federation.min.js"></script>
     <script type="text/javascript" src="bower_components/postal.xframe/lib/postal.xframe.min.js"></script>
-
-    <title>PostalJS Example App</title>
+    <script type="text/javascript" src="bower_components/conduitjs/lib/conduit.min.js"></script>
+    <script type="text/javascript" src="bower_components/postal.preserve/lib/postal.preserve.min.js"></script>
 </head>
 
 <body>
@@ -47,9 +46,19 @@
     postal.instanceId("frameWindow1");
     postal.fedx.addFilter([
         {channel: 'frames', topic: '#', direction: 'in'},
-        {channel: 'parent',topic: '#', direction: 'out'}
+        {channel: 'parent', topic: '#', direction: 'out'}
     ]);
+
+    //    var tap = postal.addWireTap(function(d, e) {
+    //        console.log("wire tapping...");
+    //        console.log("ID: " + postal.instanceId() + " - " + JSON.stringify(e, null, 4));
+    //    });
+    //
+    //    console.log("tap:");
+    //    console.log(tap);
+
     postal.fedx.signalReady();
+
 
     function onPublish() {
         console.log("frame-1 publish");
@@ -61,19 +70,21 @@
         return false;
     }
 
-    postal.subscribe({
+    var sub = postal.subscribe({
         channel: "frames",
         topic: "parent.message",
         callback: function (data, envelope) {
             console.log("frame-1 subscribe");
             ul = document.getElementById("itemList");
-            for (i = 0; i <= data.length; i++) {
+            for (i = 0; i < data.length; i++) {
                 li = document.createElement("li");
+                console.log(data);
                 li.appendChild(document.createTextNode(data[i]));
                 ul.appendChild(li);
             }
         }
     });
+    sub.enlistPreserved();
 
 </script>
 
