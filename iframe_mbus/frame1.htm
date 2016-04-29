@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8"/>
+    <title>PostalJS Example App</title>
+    <style>
+        #f1 {
+            position: absolute;
+        }
+
+        #f2 {
+            position: absolute;
+            left: 14.5em;
+        }
+    </style>
+    <script type="text/javascript" src="../bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="../bower_components/postal.js/lib/postal.min.js"></script>
+    <script type="text/javascript" src="../bower_components/babel-polyfill/browser-polyfill.js"></script>
+    <script type="text/javascript" src="../bower_components/postal.federation/lib/postal.federation.min.js"></script>
+    <script type="text/javascript" src="../bower_components/postal.xframe/lib/postal.xframe.min.js"></script>
+    <script type="text/javascript" src="../bower_components/conduitjs/lib/conduit.min.js"></script>
+    <script type="text/javascript" src="../bower_components/postal.preserve/lib/postal.preserve.min.js"></script>
+</head>
+
+<body>
+
+<script>
+    // listing
+    var names = [];
+    function addItem() {
+        console.log("call add()");
+        var li, ul, i;
+        i = names.length;
+        names[i] = document.getElementById("name").value;
+        console.log("i: " + i);
+        console.log("name: " + names[i]);
+        ul = document.getElementById("itemList");
+        li = document.createElement("li");
+        li.appendChild(document.createTextNode(names[i]));
+        ul.appendChild(li);
+        console.log("names: " + names);
+        return false;
+    }
+
+    postal.instanceId("frameWindow1");
+    postal.fedx.addFilter([
+        {channel: 'frame', topic: '#', direction: 'both'},
+        {channel: 'parent', topic: '#', direction: 'out'}
+    ]);
+
+    //    var tap = postal.addWireTap(function(d, e) {
+    //        console.log("wire tapping...");
+    //        console.log("ID: " + postal.instanceId() + " - " + JSON.stringify(e, null, 4));
+    //    });
+    //
+    //    console.log("tap:");
+    //    console.log(tap);
+//
+    postal.fedx.signalReady();
+//
+//
+//    function onPublish() {
+//        console.log("frame-1 publish");
+//        postal.publish({
+//            channel: "parent",
+//            topic: "frame.message",
+//            data: names
+//        });
+//        return false;
+//    }
+
+    postal.subscribe({
+        channel: "frame",
+        topic: "#",
+        callback: function (data, envelope) {
+            console.log("frame-1 subscribe");
+            console.log(data);
+            ul = document.getElementById("itemList");
+            for (x in data) {
+                li = document.createElement("li");
+                console.log(data[x]);
+                li.appendChild(document.createTextNode(data[x]));
+                ul.appendChild(li);
+            }
+        }
+    });
+
+</script>
+
+<form id="f1" onsubmit="return addItem()" method="get">
+    <input id='name' value="Name" type="text" name="name"/>
+    <input type="submit" value="add" name="add"/>
+</form>
+<form id="f2" onsubmit="return onPublish()" method="get">
+    <input type="submit" value="publish" name="pub"/>
+</form>
+
+<ul id="itemList" style="position:relative;top:3em;"></ul>
+
+
+</body>
+
+</html>

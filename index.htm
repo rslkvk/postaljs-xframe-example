@@ -23,8 +23,7 @@
     </ul>
 </div>
 
-<div id
-             ="sidebar">
+<div id="sidebar">
     <ul id="publist">
     </ul>
 </div>
@@ -55,20 +54,20 @@
 //        console.log("federationInfo: \n" + federationInfo);
     });
 
-    postal.subscribe({
-        channel: "parent",
-        topic: "frame.message",
-        callback: function (data, envelope) {
-            console.log("parent subscribe");
-            var ul, li;
-            ul = document.getElementById("publist");
-            for (i = 0; i < data.length; i++) {
-                li = document.createElement("li");
-                li.appendChild(document.createTextNode(data[i]));
-                ul.appendChild(li);
+        postal.subscribe({
+            channel: "parent",
+            topic: "frame.message",
+            callback: function (data, envelope) {
+                console.log("parent subscribe");
+                var ul, li;
+                ul = document.getElementById("publist");
+                for (i = 0; i < data.length; i++) {
+                    li = document.createElement("li");
+                    li.appendChild(document.createTextNode(data[i]));
+                    ul.appendChild(li);
+                }
             }
-        }
-    });
+        });
 
     function onPublish() {
         console.log("send remote: " + postal.fedx.canSendRemote('frames', 'parent.message'));
