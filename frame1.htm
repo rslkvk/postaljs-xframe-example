@@ -58,17 +58,17 @@
     //    console.log(tap);
 
     postal.fedx.signalReady();
-
-
-    function onPublish() {
-        console.log("frame-1 publish");
-        postal.publish({
-            channel: "parent",
-            topic: "frame.message",
-            data: names
-        });
-        return false;
-    }
+//
+//
+//    function onPublish() {
+//        console.log("frame-1 publish");
+//        postal.publish({
+//            channel: "parent",
+//            topic: "frame.message",
+//            data: names
+//        });
+//        return false;
+//    }
 
     var sub = postal.subscribe({
         channel: "frames",

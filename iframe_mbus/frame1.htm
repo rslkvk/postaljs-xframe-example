@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="utf-8"/>
     <title>PostalJS Example App</title>
@@ -21,16 +20,24 @@
     <script type="text/javascript" src="../bower_components/postal.xframe/lib/postal.xframe.min.js"></script>
     <script type="text/javascript" src="../bower_components/conduitjs/lib/conduit.min.js"></script>
     <script type="text/javascript" src="../bower_components/postal.preserve/lib/postal.preserve.min.js"></script>
+    <script type="text/javascript" src="pub.js"></script>
+    <script type="text/javascript" src="sub.js"></script>
 </head>
 
 <body>
-
 <script>
+    (function() {
+        //publish => ftp=frame to portal
+        pub.init("app1", "ftp");
+        //subscribe => ptf=portal to frame
+        sub.init("app1", "ptf");
+    }());
+
     // listing
     var names = [];
+    var li, ul, i;
     function addItem() {
         console.log("call add()");
-        var li, ul, i;
         i = names.length;
         names[i] = document.getElementById("name").value;
         console.log("i: " + i);
@@ -42,49 +49,21 @@
         console.log("names: " + names);
         return false;
     }
+    function onPublish() {
+        pub.publish(names);
+        return false;
+    }
 
-    postal.instanceId("frameWindow1");
-    postal.fedx.addFilter([
-        {channel: 'frame', topic: '#', direction: 'both'},
-        {channel: 'parent', topic: '#', direction: 'out'}
-    ]);
-
-    //    var tap = postal.addWireTap(function(d, e) {
-    //        console.log("wire tapping...");
-    //        console.log("ID: " + postal.instanceId() + " - " + JSON.stringify(e, null, 4));
-    //    });
-    //
-    //    console.log("tap:");
-    //    console.log(tap);
-//
-    postal.fedx.signalReady();
-//
-//
-//    function onPublish() {
-//        console.log("frame-1 publish");
-//        postal.publish({
-//            channel: "parent",
-//            topic: "frame.message",
-//            data: names
-//        });
-//        return false;
-//    }
-
-    postal.subscribe({
-        channel: "frame",
-        topic: "#",
-        callback: function (data, envelope) {
-            console.log("frame-1 subscribe");
-            console.log(data);
-            ul = document.getElementById("itemList");
-            for (x in data) {
-                li = document.createElement("li");
-                console.log(data[x]);
-                li.appendChild(document.createTextNode(data[x]));
-                ul.appendChild(li);
-            }
+    sub.subscribe().callback = function(data, envelope) {
+        ul = document.getElementById("itemList");
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+            li = document.createElement("li");
+            li.appendChild(document.createTextNode(data[keys[i]]));
+            ul.appendChild(li);
         }
-    });
+    };
+
 
 </script>
 
